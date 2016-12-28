@@ -4,7 +4,7 @@ project(denseFlow)
 set(CMAKE_BUILD_TYPE Release)
 
 # -- options
-set(USE_LDOF ON)
+set(USE_LDOF OFF)
 
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
