@@ -1,13 +1,15 @@
-#include "opencv2/video.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/highgui.hpp"
+#include "opencv2/video/video.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 #include <stdio.h>
 #include <iostream>
 
+#ifdef USE_LDOF
 #include "CTensorOpencv.h"
 #include "CFilter.h"
 #include "ldof.h"
+#endif // USE_LDOF
 
 using namespace std;
 using namespace cv;
@@ -22,6 +24,7 @@ using namespace cv;
  * @param img current 3-channel frame
  * @param flow the result flow
  */
+#ifdef USE_LDOF
 void myCpuCalcOpticalFlowLDOF(const Mat prev_img, const Mat img, Mat &flow)
 {
     CTensorOpencv<float> prevFrame;
@@ -44,6 +47,7 @@ void myCpuCalcOpticalFlowLDOF(const Mat prev_img, const Mat img, Mat &flow)
 
     fflow.copyToMat( flow );
 }
+#endif // USE_LDOF
 
 static void convertFlowToImage(const Mat &flow_x, const Mat &flow_y, Mat &img_x, Mat &img_y, double lowerBound, double higherBound) {
 	#define CAST(v, L, H) ((v) > (H) ? 255 : (v) < (L) ? 0 : cvRound(255*((v) - (L))/((H)-(L))))
@@ -144,7 +148,11 @@ int main(int argc, char** argv)
             calcOpticalFlowFarneback(prev_grey, grey, flow, 0.702, 5, 10, 2, 7, 1.5, cv::OPTFLOW_FARNEBACK_GAUSSIAN );
             break;
         case 1:
+#ifdef USE_LDOF
             myCpuCalcOpticalFlowLDOF(prev_image, image, flow);
+#else
+            cout << "LDOF is not built" << endl;
+#endif // USE_LDOF
             break;
         }
 		

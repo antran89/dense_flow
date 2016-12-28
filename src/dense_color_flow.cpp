@@ -4,23 +4,27 @@
  *
  */
 
-#include "opencv2/video.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/highgui.hpp"
+#include "opencv2/video/video.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
 #include "opencv2/cudaoptflow.hpp"
 
 #include <stdio.h>
 #include <iostream>
 #include <string>
 
+#ifdef USE_LDOF
 #include "CTensorOpencv.h"
 #include "CFilter.h"
 #include "ldof.h"
+#endif // USE_LDOF
+
 #include "color_flow.hpp"
 
 using namespace std;
 using namespace cv;
 
+#ifdef USE_LDOF
 void myCalcOpticalFlowLDOF(const Mat prev_img, const Mat img, Mat &flow, bool useGPU)
 {
     CTensorOpencv<float> prevFrame;
@@ -45,6 +49,7 @@ void myCalcOpticalFlowLDOF(const Mat prev_img, const Mat img, Mat &flow, bool us
 
     fflow.copyToMat( flow );
 }
+#endif // USE_LDOF
 
 static void convertFlowToImage(const Mat &flow_x, const Mat &flow_y, Mat &img_x, Mat &img_y,
                                double lowerBound, double higherBound) {
@@ -166,7 +171,11 @@ int main(int argc, char** argv){
             break;
         }
         case 3:     // gpu ldof computations (not in opencv flow)
+#ifdef USE_LDOF
             myCalcOpticalFlowLDOF(prev_image, image, flow, true);
+#else
+            cout << "LDOF is not built" << endl;
+#endif // USE_LDOF
             break;
         default:
             cout << "unknown type of optical flows algorithm" << endl;

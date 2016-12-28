@@ -1,19 +1,22 @@
-#include "opencv2/video.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/highgui.hpp"
+#include "opencv2/video/video.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
 #include "opencv2/cudaoptflow.hpp"
 
 #include <stdio.h>
 #include <iostream>
 #include <string>
 
+#ifdef USE_LDOF
 #include "CTensorOpencv.h"
 #include "CFilter.h"
 #include "ldof.h"
+#endif // USE_LDOF
 
 using namespace std;
 using namespace cv;
 
+#ifdef USE_LDOF
 void myCalcOpticalFlowLDOF(const Mat prev_img, const Mat img, Mat &flow, bool useGPU)
 {
     CTensorOpencv<float> prevFrame;
@@ -38,6 +41,7 @@ void myCalcOpticalFlowLDOF(const Mat prev_img, const Mat img, Mat &flow, bool us
 
     fflow.copyToMat( flow );
 }
+#endif // USE_LDOF
 
 static void convertFlowToImage(const Mat &flow_x, const Mat &flow_y, Mat &img_x, Mat &img_y,
                                double lowerBound, double higherBound) {
@@ -110,7 +114,7 @@ int main(int argc, char** argv){
     new_width = (new_width > 0) ? new_width : capture.get(CV_CAP_PROP_FRAME_WIDTH);
     cv::Size new_size(new_width, new_height);
 
-    int frame_num = 0;
+    int frame_index = -1, result_index = 0;
     Mat image, prev_image, prev_grey, grey, org_frame, frame, flow, flow_x, flow_y, flows[2];
     cuda::GpuMat frame_0, frame_1, d_flow;
 
@@ -121,13 +125,14 @@ int main(int argc, char** argv){
 
     while(true) {
         capture >> org_frame;
+        frame_index++;
         if(org_frame.empty())
             break;
 
         // resize frame
         resize(org_frame, frame, new_size);
 
-        if(frame_num == 0) {
+        if(frame_index == 0) {
             image.create(frame.size(), CV_8UC3);
             grey.create(frame.size(), CV_8UC1);
             prev_image.create(frame.size(), CV_8UC3);
@@ -136,11 +141,10 @@ int main(int argc, char** argv){
             frame.copyTo(prev_image);
             cvtColor(prev_image, prev_grey, CV_BGR2GRAY);
 
-            frame_num++;
-
             int step_t = step;
             while (step_t > 1){
                 capture >> frame;
+                frame_index++;
                 step_t--;
             }
             continue;
@@ -172,7 +176,11 @@ int main(int argc, char** argv){
             break;
         }
         case 3:     // gpu ldof computations (not in opencv flow)
+#ifdef USE_LDOF
             myCalcOpticalFlowLDOF(prev_image, image, flow, true);
+#else
+            cout << "LDOF is not built" << endl;
+#endif // USE_LDOF
             break;
         default:
             cout << "unknown type of optical flows algorithm" << endl;
@@ -191,7 +199,7 @@ int main(int argc, char** argv){
         Mat imgY(flow_y.size(), CV_8UC1);
         convertFlowToImage(flow_x,flow_y, imgX, imgY, -bound, bound);
         char tmp[20];
-        sprintf(tmp,"_%04d.jpg",int(frame_num));
+        sprintf(tmp,"_%04d.jpg",int(++result_index));
 
         imwrite(xFlowFile + tmp, imgX);
         imwrite(yFlowFile + tmp, imgY);
@@ -203,11 +211,11 @@ int main(int argc, char** argv){
         if (type != 3)
             std::swap(prev_grey, grey);
         std::swap(prev_image, image);
-        frame_num = frame_num + 1;
 
         int step_t = step;
         while (step_t > 1){
             capture >> org_frame;
+            frame_index++;
             step_t--;
         }
     }
