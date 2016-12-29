@@ -1,26 +1,30 @@
 #!/bin/bash
 
 SCRIPT_NAME="$0"
-if [ $# != 3 ]; then
+if [ $# < 2 ]; then
 	echo 'The arguments for the program are not correct!'
-	printf 'Usage: %s START_VIDEO_INDEX END_VIDEO_INDEX NUM_WORKERS\n' $SCRIPT_NAME
+	printf 'Usage: %s NUM_WORKERS START_VIDEO_INDEX [END_VIDEO_INDEX]\n' $SCRIPT_NAME
 	exit
 fi
-
-# run parameters
-START_VIDEO_INDEX=$1
-END_VIDEO_INDEX=$2
-NUM_WORKERS=$3
-
-# a trick to make a program to see only GPU 1
-export CUDA_VISIBLE_DEVICES="0"
-
-start=$(date +%s)
 
 # dataset parameters
 VIDEO_FOLDER=/media/tranlaman/data/ActivityNet/Crawler/tests/
 FLOW_FOLDER=/media/tranlaman/data/ActivityNet/Crawler/tests_extracted_images/flow_folder/
 IMG_FOLDER=/media/tranlaman/data/ActivityNet/Crawler/tests_extracted_images/img_folder/
+
+# run parameters
+NUM_WORKERS=$1
+START_VIDEO_INDEX=$2
+if [ $# == 3 ]; then
+	END_VIDEO_INDEX=$3
+else
+	END_VIDEO_INDEX=$(ls -1 $VIDEO_FOLDER/*.mp4 | wc -l)
+fi
+
+# a trick to make a program to see only GPU 1
+export CUDA_VISIBLE_DEVICES="0"
+
+start=$(date +%s)
 
 # parameters of flows, step
 FLOW_STEP=2

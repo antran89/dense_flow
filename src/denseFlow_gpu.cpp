@@ -106,7 +106,7 @@ int main(int argc, char** argv){
 
     VideoCapture capture(vidFile);
     if(!capture.isOpened()) {
-        printf("Could not initialize capturing..\n");
+        printf("Could not initialize capturing...%s\n", vidFile.c_str());
         return -1;
     }
 

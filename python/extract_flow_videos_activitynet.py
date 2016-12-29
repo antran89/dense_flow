@@ -117,8 +117,8 @@ def main():
         cnt = 0
         for ann in vid_anns:
             cnt += 1
-            flow_vid_folder = os.path.join(flow_folder, '%s_segment%d' % (file_basename, cnt))
-            img_vid_folder = os.path.join(img_folder, '%s_segment%d' % (file_basename, cnt))
+            flow_vid_folder = os.path.join(flow_folder, '%s_seg%d' % (file_basename, cnt))
+            img_vid_folder = os.path.join(img_folder, '%s_seg%d' % (file_basename, cnt))
             if not os.path.isdir(flow_vid_folder):
                 os.mkdir(flow_vid_folder)
                 os.mkdir(img_vid_folder)
