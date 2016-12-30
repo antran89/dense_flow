@@ -7,7 +7,7 @@
 #include "opencv2/video/video.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
-#include "opencv2/cudaoptflow.hpp"
+#include "opencv2/gpu/gpu.hpp"
 
 #include <stdio.h>
 #include <iostream>
@@ -114,15 +114,15 @@ int main(int argc, char** argv){
 
     int frame_num = 0;
     Mat image, prev_image, prev_grey, grey, frame, flow, flow_x, flow_y, flows[2];
-    cuda::GpuMat frame_0, frame_1, d_flow;
     ColorFlow color_flow;
+    gpu::GpuMat frame_0, frame_1, flow_u, flow_v;
 
-    cuda::setDevice(device_id);
-    Ptr<cuda::FarnebackOpticalFlow> alg_farn = cuda::FarnebackOpticalFlow::create();
-    Ptr<cuda::OpticalFlowDual_TVL1> alg_tvl1 = cuda::OpticalFlowDual_TVL1::create();
-    Ptr<cuda::BroxOpticalFlow> alg_brox = cuda::BroxOpticalFlow::create(0.197f, 50.0f, 0.8f, 10, 77, 10);
+    gpu::setDevice(device_id);
+    gpu::FarnebackOpticalFlow alg_farn;
+    gpu::OpticalFlowDual_TVL1_GPU alg_tvl1;
+    gpu::BroxOpticalFlow alg_brox(0.197f, 50.0f, 0.8f, 10, 77, 10);
 
-    while(true) {
+    while (true) {
         capture >> frame;
         if(frame.empty())
             break;
@@ -157,17 +157,17 @@ int main(int argc, char** argv){
         // GPU optical flow
         switch(type){
         case 0:
-            alg_farn->calc(frame_0, frame_1, d_flow);
+            alg_farn(frame_0, frame_1, flow_u, flow_v);
             break;
         case 1:
-            alg_tvl1->calc(frame_0, frame_1, d_flow);
+            alg_tvl1(frame_0, frame_1, flow_u, flow_v);
             break;
         case 2:
         {
-            cuda::GpuMat d_frame0f, d_frame1f;
+            gpu::GpuMat d_frame0f, d_frame1f;
             frame_0.convertTo(d_frame0f, CV_32F, 1.0 / 255.0);
             frame_1.convertTo(d_frame1f, CV_32F, 1.0 / 255.0);
-            alg_brox->calc(d_frame0f, d_frame1f, d_flow);
+            alg_brox(d_frame0f, d_frame1f, flow_u, flow_v);
             break;
         }
         case 3:     // gpu ldof computations (not in opencv flow)
@@ -183,11 +183,14 @@ int main(int argc, char** argv){
             break;
         }
 
-        if (type != 3)
-            d_flow.download(flow);
-        cv::split(flow, flows);
-        flow_x = flows[0];
-        flow_y = flows[1];
+        if (type == 3) {
+            cv::split(flow, flows);
+            flow_x = flows[0];
+            flow_y = flows[1];
+        } else {
+            flow_u.download(flow_x);
+            flow_v.download(flow_y);
+        }
 
         // Output optical flow
         Mat flow_image;

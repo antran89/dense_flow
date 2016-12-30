@@ -7,6 +7,7 @@
 #include "color_flow.hpp"
 
 #include <math.h>
+#include <stdio.h>
 #include <iostream>
 
 // the "official" threshold - if the absolute value of either
