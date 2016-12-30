@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_NAME="$0"
-if [ $# < 2 ]; then
+if [[ $# < 2 ]]; then
 	echo 'The arguments for the program are not correct!'
 	printf 'Usage: %s NUM_WORKERS START_VIDEO_INDEX [END_VIDEO_INDEX]\n' $SCRIPT_NAME
 	exit
@@ -15,7 +15,7 @@ IMG_FOLDER=/media/tranlaman/data/ActivityNet/Crawler/tests_extracted_images/img_
 # run parameters
 NUM_WORKERS=$1
 START_VIDEO_INDEX=$2
-if [ $# == 3 ]; then
+if [[ $# == 3 ]]; then
 	END_VIDEO_INDEX=$3
 else
 	END_VIDEO_INDEX=$(ls -1 $VIDEO_FOLDER/*.mp4 | wc -l)
