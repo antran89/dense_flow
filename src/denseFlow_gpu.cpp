@@ -90,7 +90,7 @@ int main(int argc, char** argv){
         "{ w  new_width        | 0  | new width of images and flows}"
     };
 
-    CommandLineParser cmd(argc, argv, keys);
+    cv::CommandLineParser cmd(argc, argv, keys);
     string vidFile = cmd.get<string>("vidFile");
     string xFlowFile = cmd.get<string>("xFlowFile");
     string yFlowFile = cmd.get<string>("yFlowFile");
@@ -104,9 +104,14 @@ int main(int argc, char** argv){
 
     bool noImageOutput = imgFile.empty();
 
+    if (vidFile.empty()) {
+        cout << "Empty video filename..." << endl;
+        return -1;
+    }
+
     VideoCapture capture(vidFile);
     if(!capture.isOpened()) {
-        printf("Could not initialize capturing...%s\n", vidFile.c_str());
+        cout << "Could not initialize capturing..." << vidFile << endl;
         return -1;
     }
 
