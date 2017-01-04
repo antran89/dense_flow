@@ -120,7 +120,7 @@ int main(int argc, char** argv){
     float fps = capture.get(CV_CAP_PROP_FPS);
     start_frame = int(start_second * fps);
     if (has_end_second)
-        end_frame = end_second * fps;
+        end_frame = int(end_second * fps);
     else end_frame = INT_MAX;
 
     new_height = (new_height > 0) ? new_height : capture.get(CV_CAP_PROP_FRAME_HEIGHT);
