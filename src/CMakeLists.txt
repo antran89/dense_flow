@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(denseFlow)
 
-set(CMAKE_BUILD_TYPE Release)
-
 # -- options
 set(USE_LDOF OFF)
 
