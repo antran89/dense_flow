@@ -3,6 +3,7 @@ project(denseFlow)
 
 # -- options
 set(USE_LDOF OFF)
+set(CUDA_USE_STATIC_CUDA_RUNTIME OFF)
 
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
