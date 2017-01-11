@@ -4,6 +4,7 @@ project(denseFlow)
 # -- options
 set(USE_LDOF OFF)
 set(CUDA_USE_STATIC_CUDA_RUNTIME OFF)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
@@ -27,3 +28,6 @@ target_link_libraries(denseFlow ${OpenCV_LIBS} ${External_LIBS})
 
 add_executable(dense_color_flow dense_color_flow.cpp color_flow.cpp color_flow.hpp)
 target_link_libraries(dense_color_flow ${OpenCV_LIBS} ${External_LIBS})
+
+add_executable(gpu_compensated_optical_flow gpu_compensated_optical_flow.cpp helper_function.cpp helper_function.h)
+target_link_libraries(gpu_compensated_optical_flow ${OpenCV_LIBS} ${External_LIBS})
