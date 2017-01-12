@@ -13,6 +13,11 @@
 #include "ldof.h"
 #endif // USE_LDOF
 
+#define FARNEBACK_FLOW 0
+#define TVL1_FLOW 1
+#define BROX_FLOW 2
+#define LDOF_FLOW 3
+
 using namespace std;
 using namespace cv;
 
@@ -122,6 +127,7 @@ int main(int argc, char** argv){
     int frame_index = -1, result_index = 0;
     Mat image, prev_image, prev_grey, grey, org_frame, frame, flow, flow_x, flow_y, flows[2];
     gpu::GpuMat frame_0, frame_1, flow_u, flow_v;
+    gpu::GpuMat d_frame0f, d_frame1f;
 
     gpu::setDevice(device_id);
     gpu::FarnebackOpticalFlow alg_farn;
@@ -146,6 +152,11 @@ int main(int argc, char** argv){
             frame.copyTo(prev_image);
             cvtColor(prev_image, prev_grey, CV_BGR2GRAY);
 
+            // upload prev_grey into gpu
+            frame_0.upload(prev_grey);
+            if (type == BROX_FLOW)
+                frame_0.convertTo(d_frame0f, CV_32F, 1.0 / 255.0);
+
             int step_t = step;
             while (step_t > 1){
                 capture >> frame;
@@ -157,30 +168,26 @@ int main(int argc, char** argv){
 
         frame.copyTo(image);
 
-        if (type != 3) {    // ldof processing rgb frames
+        if (type != LDOF_FLOW) {    // ldof processing rgb frames
             cvtColor(image, grey, CV_BGR2GRAY);
-            frame_0.upload(prev_grey);
             frame_1.upload(grey);
         }
 
-
         // GPU optical flow
         switch (type) {
-        case 0:
+        case FARNEBACK_FLOW:
             alg_farn(frame_0, frame_1, flow_u, flow_v);
             break;
-        case 1:
+        case TVL1_FLOW:
             alg_tvl1(frame_0, frame_1, flow_u, flow_v);
             break;
-        case 2:
+        case BROX_FLOW:
         {
-            gpu::GpuMat d_frame0f, d_frame1f;
-            frame_0.convertTo(d_frame0f, CV_32F, 1.0 / 255.0);
             frame_1.convertTo(d_frame1f, CV_32F, 1.0 / 255.0);
             alg_brox(d_frame0f, d_frame1f, flow_u, flow_v);
             break;
         }
-        case 3:     // gpu ldof computations (not in opencv flow)
+        case LDOF_FLOW:     // gpu ldof computations (not in opencv flow)
 #ifdef USE_LDOF
             myCalcOpticalFlowLDOF(prev_image, image, flow, true);
 #else
@@ -193,7 +200,7 @@ int main(int argc, char** argv){
             break;
         }
 
-        if (type == 3) {
+        if (type == LDOF_FLOW) {
             cv::split(flow, flows);
             flow_x = flows[0];
             flow_y = flows[1];
@@ -216,9 +223,13 @@ int main(int argc, char** argv){
             imwrite(imgFile + tmp, image);
         }
 
-        if (type != 3)
-            std::swap(prev_grey, grey);
-        std::swap(prev_image, image);
+        if (type != LDOF_FLOW)
+            prev_grey = std::move(grey);
+        prev_image = std::move(image);
+        if (type != LDOF_FLOW)
+            frame_1.copyTo(frame_0);
+        if (type == BROX_FLOW)
+            d_frame1f.copyTo(d_frame0f);
 
         int step_t = step;
         while (step_t > 1){

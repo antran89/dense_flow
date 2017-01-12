@@ -17,7 +17,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/gpu/gpu.hpp>
 
-#define FARNERBACK_FLOW 0
+#define FARNEBACK_FLOW 0
 #define TVL1_FLOW 1
 #define BROX_FLOW 2
 #define LDOF_FLOW 3
@@ -156,7 +156,7 @@ int main(int argc, char** argv){
 
         // GPU optical flow
         switch (type) {
-        case FARNERBACK_FLOW:
+        case FARNEBACK_FLOW:
             alg_farn(frame_0, frame_1, flow_u, flow_v);
             break;
         case TVL1_FLOW:
@@ -212,7 +212,7 @@ int main(int argc, char** argv){
             d_frame_warp.upload(frame_warp);
 
         switch (type) {
-        case FARNERBACK_FLOW:
+        case FARNEBACK_FLOW:
             alg_farn(frame_0, d_frame_warp, flow_u, flow_v);
             break;
         case TVL1_FLOW:
