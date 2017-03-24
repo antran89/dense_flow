@@ -97,7 +97,7 @@ def main():
         img_file = os.path.join(img_vid_folder, 'im')
         flow_x_file = os.path.join(flow_vid_folder, 'flow_x')
         flow_y_file = os.path.join(flow_vid_folder, 'flow_y')
-        cmd = '../src-build/denseFlow_gpu -f=\'%s\' -i=\'%s\' -x=\'%s\' -y=\'%s\' -h=%d -w=%d -b=20 -t=%d -d=%d -s=%d' \
+        cmd = '../src-build/gpu_compensated_optical_flow -f=\'%s\' -i=\'%s\' -x=\'%s\' -y=\'%s\' -h=%d -w=%d -b=20 -t=%d -d=%d -s=%d' \
         % (vid, img_file, flow_x_file, flow_y_file, new_height, new_width, flow_type, device_id, step)
         
         os.system(cmd)

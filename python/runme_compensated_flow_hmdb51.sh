@@ -20,6 +20,13 @@ END_CLASS_INDEX=51
 NUM_WORKERS=5
 workers_step=$(( (END_CLASS_INDEX - START_CLASS_INDEX)/NUM_WORKERS ))
 
+if [ ! -d $FLOW_FOLDER ]; then
+	mkdir -p $FLOW_FOLDER
+fi
+if [ ! -d $IMG_FOLDER ]; then
+	mkdir -p $IMG_FOLDER
+fi
+
 index=$START_CLASS_INDEX
 for i in `seq 1 $NUM_WORKERS`; do
 	if [ $i == $NUM_WORKERS ]
