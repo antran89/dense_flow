@@ -30,3 +30,6 @@ target_link_libraries(dense_color_flow ${OpenCV_LIBS} ${External_LIBS})
 
 add_executable(gpu_compensated_optical_flow gpu_compensated_optical_flow.cpp helper_function.cpp helper_function.h)
 target_link_libraries(gpu_compensated_optical_flow ${OpenCV_LIBS} ${External_LIBS})
+
+add_executable(gpu_compensated_optical_flow_with_segment gpu_compensated_optical_flow_with_segment.cpp helper_function.cpp helper_function.h)
+target_link_libraries(gpu_compensated_optical_flow_with_segment ${OpenCV_LIBS} ${External_LIBS})
