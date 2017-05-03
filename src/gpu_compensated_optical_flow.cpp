@@ -52,7 +52,7 @@ int main(int argc, char** argv){
         "{ f | vidFile      | ex2.avi | filename of video }"
         "{ x | xFlowFile    | flow_x  | filename of flow x component }"
         "{ y | yFlowFile    | flow_y  | filename of flow y component }"
-        "{ i | imgFile      | <none> | filename of flow image}"
+        "{ i | imgFile      || filename of flow image}"
         "{ b | bound        | 15 | specify the maximum of optical flow}"
         "{ t | type         | 1  | specify the optical flow algorithm }"
         "{ d | device_id    | 0  | set gpu id}"
