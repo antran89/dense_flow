@@ -40,7 +40,8 @@ def parse_args():
     parser.add_argument('--end_index', dest='end_index', help='end index class to extract flows for that class', default=101,
                         type=int)
     parser.add_argument('--device_id', dest='device_id', help='which gpu to run flow algorithm', default=0, type=int)
-
+    parser.add_argument('--video_format', dest='video_format', help='video format', default='avi', type=str)
+    
     args = parser.parse_args()
 
     return args
@@ -57,6 +58,7 @@ def main():
     start_index = args.start_index
     end_index = args.end_index
     device_id = args.device_id
+    video_format = args.video_format
     
     if not os.path.isdir(dataset_folder):
         print('Video dataset folder is not a folder. Quitting...\n')
@@ -76,7 +78,7 @@ def main():
         if not os.path.isdir(os.path.join(img_folder, action)):
             os.mkdir(os.path.join(img_folder, action))
         
-        videos = glob.glob(os.path.join(dataset_folder, action, '*.avi'))
+        videos = glob.glob(os.path.join(dataset_folder, action, '*.%s' % video_format))
         videos.sort()
         
         for vid in videos:

@@ -41,6 +41,7 @@ def parse_args():
                         type=int)
     parser.add_argument('--device_id', dest='device_id', help='which gpu to run flow algorithm', default=0, type=int)
     parser.add_argument('--video_format', dest='video_format', help='video format', default='avi', type=str)
+    
     args = parser.parse_args()
 
     return args
