@@ -112,8 +112,8 @@ def main():
             flow_x_file = os.path.join(flow_vid_folder, 'flow_x')
             flow_y_file = os.path.join(flow_vid_folder, 'flow_y')
 
-            cmd = '../src-build/gpu_compensated_optical_flow -f=\'%s\' -x=\'%s\' -y=\'%s\' -h=%d -w=%d -b=20 -t=%d -d=%d -s=%d' \
-            % (vid, flow_x_file, flow_y_file, new_height, new_width, flow_type, device_id, step)
+            cmd = '../src-build/gpu_compensated_optical_flow -f=\'%s\' -i=\'%s\' -x=\'%s\' -y=\'%s\' -h=%d -w=%d -b=20 -t=%d -d=%d -s=%d' \
+            % (vid, img_file, flow_x_file, flow_y_file, new_height, new_width, flow_type, device_id, step)
             os.system(cmd)
             continue
         cnt = 0
@@ -134,8 +134,8 @@ def main():
             flow_y_file = os.path.join(flow_vid_folder, 'flow_y')
             
             segment = ann['segment']
-            cmd = '../src-build/gpu_compensated_optical_flow_with_segment -f=\'%s\' -x=\'%s\' -y=\'%s\' -h=%d -w=%d -b=20 -t=%d -d=%d -s=%d -ss=%f -es=%f' \
-            % (vid, flow_x_file, flow_y_file, new_height, new_width, flow_type, device_id, step, segment[0], segment[1])
+            cmd = '../src-build/gpu_compensated_optical_flow_with_segment -f=\'%s\' -i=\'%s\' -x=\'%s\' -y=\'%s\' -h=%d -w=%d -b=20 -t=%d -d=%d -s=%d -ss=%f -es=%f' \
+            % (vid, img_file, flow_x_file, flow_y_file, new_height, new_width, flow_type, device_id, step, segment[0], segment[1])
             os.system(cmd)
 
 if __name__ == '__main__':
